@@ -217,6 +217,22 @@ export class OfferController extends Controller {
 
     this.logger.info(`Get premium offers for city: ${city}`);
 
+    const authToken = req.headers.authorization?.split(' ')[1];
+    const user = authToken ? await this.tokenService.findById(authToken)
+      .then((token) => token?.userId)
+      .then((userId) => userId ? this.userService.findById(userId) : null)
+      : null;
+
+    if (!user) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Unauthorized'});
+      return;
+    }
+
+    if (user.type !== 'pro') {
+      this.send(res, StatusCodes.FORBIDDEN, {message: 'Only premium users can access this endpoint'});
+      return;
+    }
+
     if (!validCities.includes(city)) {
       this.send(res, StatusCodes.BAD_REQUEST, {
         message: `Invalid city. Must be one of: ${validCities.join(', ')}`
