@@ -1,6 +1,6 @@
 // Fix the import syntax
 import { pino } from 'pino';
 
-const logger = pino();
+const appLogger = pino();
 
-export default logger;
+export default appLogger;

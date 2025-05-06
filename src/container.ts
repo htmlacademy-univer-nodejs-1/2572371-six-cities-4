@@ -1,10 +1,22 @@
+import 'reflect-metadata';
 import { Container } from 'inversify';
-import { Application } from './application.js';
-import logger from './logger.js';
+import {createOfferContainer} from './modules/rental-offers/rental-offer.container.js';
+import {createUsersContainer} from './modules/users/user-service.container.js';
+import {Application} from './application.js';
+import {Config} from 'convict';
+import config, {AppConfig} from './config.js';
+import {Logger} from 'pino';
+import appLogger from './appLogger.js';
 
-const container = new Container();
+export function create() {
+  const container = new Container();
+  container.bind<Application>('App').to(Application).inSingletonScope();
+  container.bind<Logger>('Log').toConstantValue(appLogger);
+  container.bind<Config<AppConfig>>('Config').toConstantValue(config);
 
-container.bind<Application>(Application).toSelf();
-container.bind('Logger').toConstantValue(logger);
+  container.loadSync(createUsersContainer())
+  container.loadSync(createOfferContainer())
 
-export default container;
+  return container;
+}
+

@@ -1,8 +1,9 @@
 import 'reflect-metadata';
-import container from './container.js';
 import config from './config.js';
 import { Application } from './application.js';
+import {create} from './container.js';
 
+const container = create();
 const app = container.get<Application>(Application);
 
 app.init();

@@ -1,4 +1,4 @@
-import convict from 'convict';
+import convict, {Config} from 'convict';
 import { ipaddress, url, email } from 'convict-format-with-validator';
 
 // Register individual formats
@@ -8,7 +8,13 @@ convict.addFormats({
   email
 });
 
-const config = convict({
+export type AppConfig = {
+  port: number,
+  dbHost: string,
+  salt: string
+}
+
+const config: Config<AppConfig> = convict({
   port: {
     doc: 'The port to bind.',
     format: 'port',

@@ -1,4 +1,4 @@
-import {RentalOffer} from '../../db/rentalOfferDbo.js';
+import {RentalOffer} from '../../modules/rental-offers/rental-offer.dbo.js';
 import fs from 'node:fs';
 import axios from 'axios';
 

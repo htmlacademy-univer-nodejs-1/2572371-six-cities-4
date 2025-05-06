@@ -45,6 +45,8 @@ const rentalOfferSchema = new mongoose.Schema({
   commentsCount: {type: Number, required: true},
   author: {type: String, required: true},
   coordinates: {type: String, required: true},
+  createdAt: {type: Date, default: Date.now},
+  updatedAt: {type: Date, default: Date.now}
 });
 
 export const RentalOfferDbo = mongoose.model<RentalOffer>('RentalOfferDbo', rentalOfferSchema);
