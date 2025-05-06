@@ -22,8 +22,8 @@ program
 program
   .command('import <filepath>')
   .description('Import data from a TSV file')
-  .action((filepath) => {
-    importData(filepath);
+  .action(async (filepath) => {
+    await importData(filepath);
   });
 
 program
@@ -40,7 +40,6 @@ program
     }
   });
 
-// If no arguments, show help by default
 if (process.argv.length <= 2) {
   showHelp();
 }

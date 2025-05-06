@@ -1,7 +1,7 @@
 import fs from 'node:fs';
 import chalk from 'chalk';
 import { connectDB } from '../../db/connect.js';
-import { RentalOfferDbo } from '../../db/rentalOfferDbo.js';
+import { RentalOfferDbo } from '../../modules/rental-offers/rental-offer.dbo.js';
 
 export const importData = async (file: string) => {
   try {
@@ -20,17 +20,43 @@ export const importData = async (file: string) => {
     const lines = data.split('\n').slice(1); // Пропускаем заголовок
     const offers = lines.filter((line) => line).map((line) => {
       const [
-        name, description, publishDate, city, previewImage, photos, isPremium,
-        isFavorite, rating, type, rooms, guests, price, amenities, author, coordinates
+        name,
+        description,
+        publishDate,
+        city,
+        previewImage,
+        photos,
+        isPremium,
+        isFavorite,
+        rating,
+        type,
+        rooms,
+        guests,
+        price,
+        amenities,
+        author,
+        commentsCount,
+        coordinates
       ] = line.split('\t');
 
       return {
-        name, description, publishDate, city, previewImage,
-        photos: photos.split(';'), isPremium: isPremium === 'Да',
-        isFavorite: isFavorite === 'Да', rating: parseFloat(rating), type,
-        rooms: parseInt(rooms, 10), guests: parseInt(guests, 10),
-        price: parseInt(price, 10), amenities: amenities.split(';'),
-        author, coordinates
+        name,
+        description,
+        publishDate,
+        city,
+        previewImage,
+        photos: photos.split(';'),
+        isPremium: isPremium === 'Да',
+        isFavorite: isFavorite === 'Да',
+        rating: parseFloat(rating),
+        type,
+        rooms: parseInt(rooms, 10),
+        guests: parseInt(guests, 10),
+        price: parseInt(price, 10),
+        amenities: amenities.split(';'),
+        author,
+        commentsCount,
+        coordinates,
       };
     });
 
