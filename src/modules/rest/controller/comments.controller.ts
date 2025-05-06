@@ -13,8 +13,8 @@ export class CommentsController extends Controller {
   constructor(
     @inject('Log') protected readonly logger: Logger,
     @inject('UserService') protected readonly userService: UserService,
-    @inject('Comments') private readonly commentService: CommentServiceInterface,
-    @inject('TokenService') private readonly tokenService: TokenService
+    @inject('CommentService') private readonly commentService: CommentServiceInterface,
+    @inject('Token') private readonly tokenService: TokenService
   ) {
     super(logger);
 
@@ -41,7 +41,7 @@ export class CommentsController extends Controller {
       if (!c) {
         return undefined;
       }
-      const user = await this.userService.findById(new mongoose.Types.ObjectId(c.userId));
+      const user = await this.userService.findById(new mongoose.Schema.Types.ObjectId(c.userId));
       if (!user) {
         return undefined;
       }

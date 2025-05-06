@@ -60,6 +60,7 @@ export class UserController extends Controller {
       id: req.body.id,
       avatar: 'avatar',
       type: 'usual',
+      favorite: [],
       passwordHash: req.body.password,
     };
 

@@ -1,7 +1,7 @@
 import mongoose, { Model } from 'mongoose';
 
 export type Token = {
-  userId: mongoose.Types.ObjectId;
+  userId: mongoose.Schema.Types.ObjectId;
   refreshToken: string;
   userAgent: string;
   expiresAt: Date;

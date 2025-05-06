@@ -7,6 +7,9 @@ import {ExceptionFilterInterface} from './modules/rest/exception-filter/exceptio
 import {ControllerInterface} from './modules/rest/controller/controller.interface.js';
 import {OfferController} from './modules/rest/controller/offer.controller.js';
 import {connectDB} from './db/connect.js';
+import {UserController} from './modules/rest/controller/user.controller.js';
+import {CommentsController} from './modules/rest/controller/comments.controller.js';
+import {FavoritesController} from './modules/rest/controller/favorites.controller.js';
 
 @injectable()
 export class Application {
@@ -16,7 +19,10 @@ export class Application {
     @inject('Log') public readonly logger: Logger,
     @inject('Config') private readonly config: Config<AppConfig>,
     @inject('ExceptionFilter') private readonly exceptionFilter: ExceptionFilterInterface,
-    @inject('OfferController') private readonly offersController: OfferController
+    @inject('OfferController') private readonly offersController: OfferController,
+    @inject('UsersController') private readonly usersController: UserController,
+    @inject('CommentsController') private readonly commentsController: CommentsController,
+    @inject('FavoritesController') private readonly favoritesController: FavoritesController,
   ) {
     this.express = express();
   }
@@ -41,7 +47,7 @@ export class Application {
   public async init(): Promise<void> {
     this.registerMiddlewares();
     this.registerExceptionFilters();
-    this.registerRoutes([this.offersController]);
+    this.registerRoutes([this.offersController, this.commentsController, this.favoritesController, this.usersController]);
 
     await connectDB(this.logger);
 

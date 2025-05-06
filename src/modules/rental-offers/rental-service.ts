@@ -3,6 +3,15 @@ import {RentalOffer, RentalOfferDbo} from './rental-offer.dbo.js';
 import mongoose from 'mongoose';
 
 export class RentalService implements RentalServiceInterface {
+
+  async findById(id: mongoose.Schema.Types.ObjectId): Promise<RentalOffer | null> {
+    return await RentalOfferDbo.findById(id).exec();
+  }
+
+  async findByIds(ids: mongoose.Schema.Types.ObjectId[]): Promise<RentalOffer[]> {
+    return await RentalOfferDbo.find({_id: {$in: ids}}).exec();
+  }
+
   async find(query: Partial<RentalOffer>): Promise<RentalOffer[]> {
     return RentalOfferDbo.find(query).exec();
   }
