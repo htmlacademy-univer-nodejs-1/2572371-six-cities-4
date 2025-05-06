@@ -1,6 +1,7 @@
 import {injectable} from 'inversify';
 import {User, UserModel} from './user-dbo.js';
 import {UserService} from './user-service.interface.js';
+import mongoose from 'mongoose';
 
 @injectable()
 export class UserDatabaseService implements UserService {
@@ -13,7 +14,7 @@ export class UserDatabaseService implements UserService {
     return user.save();
   }
 
-  async findById(id: string): Promise<User | null> {
+  async findById(id: mongoose.Types.ObjectId): Promise<User | null> {
     return UserModel.findById(id).exec();
   }
 

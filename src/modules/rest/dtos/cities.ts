@@ -24,10 +24,7 @@ export enum AmenityType {
   Fridge = 'Fridge'
 }
 
-export enum UserType {
-  Regular = 'regular',
-  Pro = 'pro'
-}
+export type UserType = 'usual' | 'pro';
 
 export interface Coordinates {
   latitude: number;

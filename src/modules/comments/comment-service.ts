@@ -2,9 +2,14 @@ import {injectable} from 'inversify';
 import {CommentServiceInterface} from './comment-service.interface.js';
 import {Comment, CommentDbo} from './comment.dbo.js';
 import {RentalOfferDbo} from '../rental-offers/rental-offer.dbo.js';
+import {Schema} from 'mongoose';
 
 @injectable()
 export class CommentService implements CommentServiceInterface {
+  async deleteByOfferId(id: Schema.Types.ObjectId): Promise<void> {
+    await CommentDbo.deleteMany({rentalOfferId: id}).exec();
+  }
+
   async find(query: Partial<Comment>): Promise<Comment[]> {
     return CommentDbo.find(query).exec();
   }
@@ -19,7 +24,7 @@ export class CommentService implements CommentServiceInterface {
   }
 
   async updateRentalOfferRating(rentalOfferId: string): Promise<void> {
-    const comments = await CommentDbo.find({ rentalOfferId: rentalOfferId }).exec();
+    const comments = await CommentDbo.find({rentalOfferId: rentalOfferId}).exec();
 
     const totalRating = comments.reduce((sum, comment) => sum + comment.rating, 0);
     const averageRating = comments.length > 0 ? totalRating / comments.length : 0;

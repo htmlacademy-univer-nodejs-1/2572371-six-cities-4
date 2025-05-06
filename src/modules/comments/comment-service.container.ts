@@ -5,7 +5,7 @@ import {CommentDbo} from './comment.dbo.js';
 
 export function createCommentsContainer(): ContainerModule {
   return new ContainerModule((bind) => {
-    bind.bind<CommentServiceInterface>(Symbol.for('CommentService')).to(CommentService);
+    bind.bind<CommentServiceInterface>('CommentService').to(CommentService);
     bind.bind(Symbol.for('CommentModel')).toConstantValue(CommentDbo);
   });
 }

@@ -1,5 +1,5 @@
 import { AmenityType, City, CityName, Coordinates, HousingType } from './cities.js';
-import { User } from './user.js';
+import { UserDto } from './userDto.js';
 
 export interface OfferShort {
   id: string;
@@ -21,11 +21,12 @@ export interface Offer extends OfferShort {
   bedrooms: number;
   maxAdults: number;
   amenities: AmenityType[];
-  host: User;
+  host: UserDto;
   coordinates: Coordinates;
 }
 
 export interface CreateOfferDto {
+  id: string;
   title: string;
   description: string;
   city: CityName;

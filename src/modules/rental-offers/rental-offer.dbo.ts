@@ -1,6 +1,7 @@
 import mongoose from 'mongoose';
 
 export type RentalOffer = {
+  id: mongoose.Schema.Types.ObjectId
   name: string;
   description: string;
   publishDate: Date;

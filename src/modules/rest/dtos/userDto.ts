@@ -1,6 +1,6 @@
 import { UserType } from './cities.js';
 
-export interface User {
+export interface UserDto {
   id: string;
   name: string;
   email: string;
@@ -22,5 +22,5 @@ export interface LoginUserDto {
 
 export interface AuthResponse {
   token: string;
-  user: User;
+  user: UserDto;
 }
