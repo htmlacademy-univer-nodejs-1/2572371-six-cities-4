@@ -1,4 +1,4 @@
-import { UserType } from "./cities.js";
+import { UserType } from './cities.js';
 
 export interface User {
   id: string;
