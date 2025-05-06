@@ -7,6 +7,7 @@ import {Config} from 'convict';
 import config, {AppConfig} from './config.js';
 import {Logger} from 'pino';
 import appLogger from './appLogger.js';
+import {createCommentsContainer} from './modules/comments/comment-service.container.js';
 
 export function create() {
   const container = new Container();
@@ -14,8 +15,9 @@ export function create() {
   container.bind<Logger>('Log').toConstantValue(appLogger);
   container.bind<Config<AppConfig>>('Config').toConstantValue(config);
 
-  container.loadSync(createUsersContainer())
-  container.loadSync(createOfferContainer())
+  container.loadSync(createUsersContainer());
+  container.loadSync(createOfferContainer());
+  container.loadSync(createCommentsContainer());
 
   return container;
 }
