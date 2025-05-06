@@ -1,6 +1,7 @@
 import mongoose, { Model } from 'mongoose';
 
 export type User = {
+  id: string;
   email: string;
   name: string;
   avatar: string;
@@ -9,6 +10,7 @@ export type User = {
 };
 
 const userSchema = new mongoose.Schema({
+  id: { type: mongoose.Schema.Types.ObjectId, unique: true, required: true },
   email: { type: String, required: true, unique: true },
   name: { type: String, required: true, minlength: 1, maxlength: 15 },
   password: { type: String, required: true },

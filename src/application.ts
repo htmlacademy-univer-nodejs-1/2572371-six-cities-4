@@ -1,11 +1,12 @@
-import express, { Express } from 'express';
-import {inject, injectable } from 'inversify';
+import express, {Express} from 'express';
+import {inject, injectable} from 'inversify';
 import {Logger} from 'pino';
 import {Config} from 'convict';
 import {AppConfig} from './config.js';
 import {ExceptionFilterInterface} from './modules/rest/exception-filter/exception-filter.interface.js';
 import {ControllerInterface} from './modules/rest/controller/controller.interface.js';
 import {OfferController} from './modules/rest/controller/offer.controller.js';
+import {connectDB} from './db/connect.js';
 
 @injectable()
 export class Application {
@@ -41,6 +42,8 @@ export class Application {
     this.registerMiddlewares();
     this.registerExceptionFilters();
     this.registerRoutes([this.offersController]);
+
+    await connectDB(this.logger);
 
     const port = this.config.get().port;
 

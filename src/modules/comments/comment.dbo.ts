@@ -2,6 +2,7 @@
 import mongoose from 'mongoose';
 
 export type Comment = {
+  id: string;
   text: string;
   rating: number; // Rating from 1-5
   rentalOfferId: string;

@@ -57,6 +57,7 @@ export class UserController extends Controller {
 
     const userDbo: User = {
       ...req.body,
+      id: req.body.id,
       avatar: 'avatar',
       type: 'usual',
       passwordHash: req.body.password,

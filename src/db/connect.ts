@@ -1,14 +1,15 @@
 import mongoose from 'mongoose';
 import dotenv from 'dotenv';
 import {Either} from '../utils/either.js';
+import {Logger} from 'pino';
 
 dotenv.config();
 
-export const connectDB: () => Promise<Either<string, void>> = async () => {
+export async function connectDB(log: Logger): Promise<Either<string, void>> {
   if (process.env.DB_HOST) {
     await mongoose.connect(process.env.DB_HOST);
-    console.log('Connected to MongoDB');
+    log.info('Connected to MongoDB');
     return { kind: 'right', value: undefined };
   }
   return { kind: 'left', value: 'Environment variable MONGO_URI is not set' };
-};
+}

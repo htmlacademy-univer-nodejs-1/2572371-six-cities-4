@@ -6,6 +6,13 @@ import {Schema} from 'mongoose';
 
 @injectable()
 export class CommentService implements CommentServiceInterface {
+  async findByOfferId(id: Schema.Types.ObjectId, count: number): Promise<Comment[]> {
+    return CommentDbo.find({rentalOfferId: id})
+      .sort({createdAt: -1})
+      .limit(count)
+      .exec();
+  }
+
   async deleteByOfferId(id: Schema.Types.ObjectId): Promise<void> {
     await CommentDbo.deleteMany({rentalOfferId: id}).exec();
   }

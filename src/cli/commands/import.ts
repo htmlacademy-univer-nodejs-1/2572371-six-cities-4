@@ -2,10 +2,11 @@ import fs from 'node:fs';
 import chalk from 'chalk';
 import { connectDB } from '../../db/connect.js';
 import { RentalOfferDbo } from '../../modules/rental-offers/rental-offer.dbo.js';
+import {pino} from 'pino';
 
 export const importData = async (file: string) => {
   try {
-    await connectDB();
+    await connectDB(pino());
 
     if (!fs.existsSync(file)) {
       console.error(chalk.red('❌ Файл не существует!'));
