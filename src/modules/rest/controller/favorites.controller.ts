@@ -8,6 +8,7 @@ import {RentalServiceInterface} from '../../rental-offers/rental-service.interfa
 import {UserService} from '../../users/user-service.interface.js';
 import {TokenService} from '../../token-service/token-service.interface.js';
 import {ValidateObjectIdMiddleware} from '../middleware/validate-objectid.middleware.js';
+import {DocumentExistsMiddleware} from '../middleware/document-exists-middleware.js';
 
 @injectable()
 export class FavoritesController extends Controller {
@@ -31,7 +32,14 @@ export class FavoritesController extends Controller {
       path: '/favorites/:offerId/:status',
       method: 'post',
       handler: this.toggleFavoriteStatus,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(
+          async (id) => !!(await this.offerService.findById(id)),
+          'Rental offer',
+          'offerId'
+        )
+      ]
     });
   }
 

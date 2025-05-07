@@ -9,6 +9,8 @@ import {UserService} from '../../users/user-service.interface.js';
 import {TokenService} from '../../token-service/token-service.interface.js';
 import {ValidateObjectIdMiddleware} from '../middleware/validate-objectid.middleware.js';
 import {ValidateDtoMiddleware} from '../middleware/validate-dto.middleware.js';
+import {RentalServiceInterface} from '../../rental-offers/rental-service.interface.js';
+import {DocumentExistsMiddleware} from '../middleware/document-exists-middleware.js';
 
 @injectable()
 export class CommentsController extends Controller {
@@ -16,6 +18,7 @@ export class CommentsController extends Controller {
     @inject('Log') protected readonly logger: Logger,
     @inject('UserService') protected readonly userService: UserService,
     @inject('CommentService') private readonly commentService: CommentServiceInterface,
+    @inject('RentalService') private readonly rentalService: RentalServiceInterface,
     @inject('Token') private readonly tokenService: TokenService
   ) {
     super(logger);
@@ -26,14 +29,29 @@ export class CommentsController extends Controller {
       path: '/offers/:offerId/comments',
       method: 'get',
       handler: this.getComments,
-      middlewares: [new ValidateObjectIdMiddleware('offerId')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(
+          async (id) => !!(await this.rentalService.findById(id)),
+          'Rental offer',
+          'offerId'
+        )
+      ]
     });
 
     this.addRoute({
       path: '/offers/:offerId/comments',
       method: 'post',
       handler: this.createComment,
-      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(CreateCommentDto)]
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new ValidateDtoMiddleware(CreateCommentDto),
+        new DocumentExistsMiddleware(
+          async (id) => !!(await this.rentalService.findById(id)),
+          'Rental offer',
+          'offerId'
+        )
+      ]
     });
   }
 

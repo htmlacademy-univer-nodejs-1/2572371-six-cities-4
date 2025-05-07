@@ -7,4 +7,4 @@ const container = create();
 const app = container.get<Application>('App');
 
 await app.init();
-app.logger.info(`Server is running on port ${config.get('port')}`);
+app.logger.info(`Server is running on port ${config.getProperties().PORT}`);

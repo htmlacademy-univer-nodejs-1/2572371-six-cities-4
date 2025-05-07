@@ -1,5 +1,5 @@
 import convict, {Config} from 'convict';
-import { ipaddress, url, email } from 'convict-format-with-validator';
+import {ipaddress, url, email} from 'convict-format-with-validator';
 
 convict.addFormats({
   ipaddress,
@@ -8,32 +8,35 @@ convict.addFormats({
 });
 
 export type AppConfig = {
-  port: number,
-  dbHost: string,
-  salt: string
+  PORT: number,
+  DB_HOST: string,
+  SALT: string,
+  UPLOAD_DIRECTORY_PATH: string
 }
 
 const config: Config<AppConfig> = convict({
-  port: {
-    doc: 'The port to bind.',
+  PORT: {
     format: 'port',
-    default: 3000,
+    default: 4000,
     env: 'PORT'
   },
-  dbHost: {
-    doc: 'Database host IP address',
-    format: 'ipaddress',
-    default: '127.0.0.1',
+  SALT: {
+    format: String,
+    default: 'salt',
+    env: 'SALT'
+  },
+  DB_HOST: {
+    format: String,
+    default: 'localhost',
     env: 'DB_HOST'
   },
-  salt: {
-    doc: 'Salt for hashing',
+  UPLOAD_DIRECTORY_PATH: {
     format: String,
-    default: '',
-    env: 'SALT'
+    default: 'uploads',
+    env: 'UPLOAD_DIRECTORY_PATH'
   }
 });
 
-config.validate({ allowed: 'strict' });
+config.validate({allowed: 'strict'});
 
 export default config;
