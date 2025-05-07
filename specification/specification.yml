@@ -4,7 +4,7 @@ info:
   description: API для сервиса аренды жилья "Шесть городов"
   version: 1.0.0
 servers:
-  - url: https://{host}:{port}/api
+  - url: http://{host}:{port}/api
     variables:
       host:
         default: localhost

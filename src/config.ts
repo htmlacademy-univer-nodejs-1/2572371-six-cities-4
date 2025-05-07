@@ -1,7 +1,6 @@
 import convict, {Config} from 'convict';
 import { ipaddress, url, email } from 'convict-format-with-validator';
 
-// Register individual formats
 convict.addFormats({
   ipaddress,
   url,

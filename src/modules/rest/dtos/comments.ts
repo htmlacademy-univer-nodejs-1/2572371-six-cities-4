@@ -1,11 +1,11 @@
-import { User } from './user.js';
+import { UserDto } from './userDto.js';
 
 export interface Comment {
   id: string;
   text: string;
-  publicationDate: string;
+  publicationDate: string | undefined;
   rating: number;
-  user: User;
+  user: UserDto;
 }
 
 export interface CreateCommentDto {

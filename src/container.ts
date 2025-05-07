@@ -8,6 +8,8 @@ import config, {AppConfig} from './config.js';
 import {Logger} from 'pino';
 import appLogger from './appLogger.js';
 import {createCommentsContainer} from './modules/comments/comment-service.container.js';
+import {RestModule} from './modules/rest/rest.container.js';
+import {TokenModule} from './modules/token-service/token-service.container.js';
 
 export function create() {
   const container = new Container();
@@ -18,6 +20,8 @@ export function create() {
   container.loadSync(createUsersContainer());
   container.loadSync(createOfferContainer());
   container.loadSync(createCommentsContainer());
+  container.loadSync(RestModule);
+  container.loadSync(TokenModule);
 
   return container;
 }
