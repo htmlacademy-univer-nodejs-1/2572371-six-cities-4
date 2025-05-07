@@ -2,18 +2,18 @@ import {injectable} from 'inversify';
 import {CommentServiceInterface} from './comment-service.interface.js';
 import {Comment, CommentDbo} from './comment.dbo.js';
 import {RentalOfferDbo} from '../rental-offers/rental-offer.dbo.js';
-import {Schema} from 'mongoose';
+import mongoose from 'mongoose';
 
 @injectable()
 export class CommentService implements CommentServiceInterface {
-  async findByOfferId(id: Schema.Types.ObjectId, count: number): Promise<Comment[]> {
+  async findByOfferId(id: mongoose.Types.ObjectId, count: number): Promise<Comment[]> {
     return CommentDbo.find({rentalOfferId: id})
       .sort({createdAt: -1})
       .limit(count)
       .exec();
   }
 
-  async deleteByOfferId(id: Schema.Types.ObjectId): Promise<void> {
+  async deleteByOfferId(id: mongoose.Types.ObjectId): Promise<void> {
     await CommentDbo.deleteMany({rentalOfferId: id}).exec();
   }
 

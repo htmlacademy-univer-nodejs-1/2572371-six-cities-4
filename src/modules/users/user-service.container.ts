@@ -5,7 +5,7 @@ import {UserModel} from './user-dbo.js';
 
 export function createUsersContainer() {
   return new ContainerModule((options) => {
-    options.bind('UserService').toConstantValue(UserModel);
-    options.bind<UserService>(Symbol.for('UserService')).to(UserDatabaseService);
+    options.bind('UserModel').toConstantValue(UserModel);
+    options.bind<UserService>('UserService').to(UserDatabaseService);
   });
 }

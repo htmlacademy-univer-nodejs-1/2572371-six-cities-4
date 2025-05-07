@@ -1,14 +1,14 @@
 import { Response, Router } from 'express';
 import { StatusCodes } from 'http-status-codes';
 import { injectable } from 'inversify';
-import { RouteInterface } from '../../rest/route.interface.js';
+import { RouteInterface } from '../route.interface.js';
 import { Logger } from 'pino';
 
 @injectable()
 export abstract class Controller {
   private readonly _router: Router;
 
-  constructor(protected readonly logger: Logger) {
+  protected constructor(protected readonly logger: Logger) {
     this._router = Router();
   }
 

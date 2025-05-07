@@ -6,5 +6,5 @@ import {create} from './container.js';
 const container = create();
 const app = container.get<Application>('App');
 
-app.init();
+await app.init();
 app.logger.info(`Server is running on port ${config.get('port')}`);

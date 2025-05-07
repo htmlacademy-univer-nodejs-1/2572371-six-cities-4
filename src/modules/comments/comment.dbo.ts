@@ -1,10 +1,9 @@
-// src/modules/comments/comment.dbo.ts
 import mongoose from 'mongoose';
 
 export type Comment = {
   id: string;
   text: string;
-  rating: number; // Rating from 1-5
+  rating: number;
   rentalOfferId: string;
   userId: string;
   createdAt?: Date;

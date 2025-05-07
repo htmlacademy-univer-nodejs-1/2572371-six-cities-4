@@ -6,14 +6,14 @@ import mongoose from 'mongoose';
 @injectable()
 export class UserDatabaseService implements UserService {
 
-  async addToFavorites(userId: mongoose.Schema.Types.ObjectId, offerId: string): Promise<void> {
+  async addToFavorites(userId: mongoose.Types.ObjectId, offerId: string): Promise<void> {
     await UserModel.updateOne(
       {_id: userId},
       {$addToSet: {favorite: offerId}}
     ).exec();
   }
 
-  async removeFromFavorites(userId: mongoose.Schema.Types.ObjectId, offerId: string): Promise<void> {
+  async removeFromFavorites(userId: mongoose.Types.ObjectId, offerId: string): Promise<void> {
     await UserModel.updateOne(
       {_id: userId},
       {$pull: {favorite: offerId}}
@@ -29,7 +29,7 @@ export class UserDatabaseService implements UserService {
     return user.save();
   }
 
-  async findById(id: mongoose.Schema.Types.ObjectId): Promise<User | null> {
+  async findById(id: mongoose.Types.ObjectId): Promise<User | null> {
     return UserModel.findById(id).exec();
   }
 

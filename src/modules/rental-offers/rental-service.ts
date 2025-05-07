@@ -4,11 +4,11 @@ import mongoose from 'mongoose';
 
 export class RentalService implements RentalServiceInterface {
 
-  async findById(id: mongoose.Schema.Types.ObjectId): Promise<RentalOffer | null> {
+  async findById(id: mongoose.Types.ObjectId): Promise<RentalOffer | null> {
     return await RentalOfferDbo.findById(id).exec();
   }
 
-  async findByIds(ids: mongoose.Schema.Types.ObjectId[]): Promise<RentalOffer[]> {
+  async findByIds(ids: mongoose.Types.ObjectId[]): Promise<RentalOffer[]> {
     return await RentalOfferDbo.find({_id: {$in: ids}}).exec();
   }
 
@@ -21,7 +21,7 @@ export class RentalService implements RentalServiceInterface {
     return rentalOffer.save();
   }
 
-  async deleteById(id: mongoose.Schema.Types.ObjectId): Promise<void> {
+  async deleteById(id: mongoose.Types.ObjectId): Promise<void> {
     await RentalOfferDbo.deleteOne({_id: id}).exec();
   }
 

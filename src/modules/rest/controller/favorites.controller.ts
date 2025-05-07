@@ -14,20 +14,20 @@ export class FavoritesController extends Controller {
     @inject('Log') protected readonly logger: Logger,
     @inject('RentalService') private readonly offerService: RentalServiceInterface,
     @inject('UserService') private readonly userService: UserService,
-    @inject('Token') private readonly tokenService: TokenService
+    @inject('TokenService') private readonly tokenService: TokenService
   ) {
     super(logger);
 
     this.logger.info('Register routes for FavoritesController...');
 
     this.addRoute({
-      path: '/',
+      path: '/favorites',
       method: 'get',
       handler: this.getFavorites
     });
 
     this.addRoute({
-      path: '/:offerId/:status',
+      path: '/favorites/:offerId/:status',
       method: 'post',
       handler: this.toggleFavoriteStatus
     });
@@ -51,7 +51,7 @@ export class FavoritesController extends Controller {
       return;
     }
 
-    const user = await this.userService.findById(userId);
+    const user = await this.userService.findById(new mongoose.Types.ObjectId(userId));
 
     if (!user) {
       this.send(res, StatusCodes.NOT_FOUND, {message: 'User not found'});
@@ -60,7 +60,7 @@ export class FavoritesController extends Controller {
 
     const favoriteOffers = await this.offerService.findByIds(
       user.favorite.map(
-        (id) => new mongoose.Schema.Types.ObjectId(id)
+        (id) => new mongoose.Types.ObjectId(id)
       )
     );
 
@@ -94,14 +94,14 @@ export class FavoritesController extends Controller {
       return;
     }
 
-    const user = await this.userService.findById(userId);
+    const user = await this.userService.findById(new mongoose.Types.ObjectId(userId));
 
     if (!user) {
       this.send(res, StatusCodes.NOT_FOUND, {message: 'User not found'});
       return;
     }
 
-    const offer = await this.offerService.findById(new mongoose.Schema.Types.ObjectId(offerId));
+    const offer = await this.offerService.findById(new mongoose.Types.ObjectId(offerId));
 
     if (!offer) {
       this.send(res, StatusCodes.NOT_FOUND, {message: `Offer with id ${offerId} not found`});
@@ -109,9 +109,9 @@ export class FavoritesController extends Controller {
     }
 
     if (isFavorite) {
-      await this.userService.addToFavorites(userId, offerId);
+      await this.userService.addToFavorites(new mongoose.Types.ObjectId(userId), offerId);
     } else {
-      await this.userService.removeFromFavorites(userId, offerId);
+      await this.userService.removeFromFavorites(new mongoose.Types.ObjectId(userId), offerId);
     }
 
     const updatedOffer = {...offer, isFavorite};

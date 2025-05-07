@@ -17,47 +17,41 @@ export class OfferController extends Controller {
     @inject('Log') protected readonly logger: Logger,
     @inject('RentalService') private readonly offerService: RentalServiceInterface,
     @inject('CommentService') private readonly commentService: CommentService,
-    @inject('Token') private readonly tokenService: TokenService,
+    @inject('TokenService') private readonly tokenService: TokenService,
     @inject('UserService') private readonly userService: UserService
   ) {
     super(logger);
 
-    // GET /offers
     this.addRoute({
       path: '/offers',
       method: 'get',
       handler: asyncHandler(this.getOffers.bind(this))
     });
 
-    // POST /offers
     this.addRoute({
       path: '/offers',
       method: 'post',
       handler: asyncHandler(this.createOffer.bind(this))
     });
 
-    // GET /offers/{offerId}
     this.addRoute({
       path: '/offers/:offerId',
       method: 'get',
       handler: asyncHandler(this.getOfferById.bind(this))
     });
 
-    // PATCH /offers/{offerId}
     this.addRoute({
       path: '/offers/:offerId',
       method: 'patch',
       handler: asyncHandler(this.updateOffer.bind(this))
     });
 
-    // DELETE /offers/{offerId}
     this.addRoute({
       path: '/offers/:offerId',
       method: 'delete',
       handler: asyncHandler(this.deleteOffer.bind(this))
     });
 
-    // GET /offers/premium/{city}
     this.addRoute({
       path: '/offers/premium/:city',
       method: 'get',
@@ -65,7 +59,6 @@ export class OfferController extends Controller {
     });
   }
 
-  // GET /offers?limit=60
   public async getOffers(req: Request, res: Response): Promise<void> {
     const limit = req.query.limit ? parseInt(req.query.limit as string, 10) : 60;
 
@@ -76,14 +69,13 @@ export class OfferController extends Controller {
     this.ok(res, offers);
   }
 
-  // POST /offers
   public async createOffer(req: Request<object, object, CreateOfferDto>, res: Response): Promise<void> {
     this.logger.info('Creating new offer');
 
     const authToken = req.headers.authorization?.split(' ')[1];
     const userEmail = authToken ? await this.tokenService.findById(authToken)
       .then((token) => token?.userId)
-      .then((userId) => userId ? this.userService.findById(userId) : null)
+      .then((userId) => userId ? this.userService.findById(new mongoose.Types.ObjectId(userId)) : null)
       .then((user) => user?.email) : null;
 
     if (!userEmail) {
@@ -109,13 +101,12 @@ export class OfferController extends Controller {
     this.created(res, offer);
   }
 
-  // GET /offers/{offerId}
   public async getOfferById(req: Request, res: Response): Promise<void> {
     const {offerId} = req.params;
 
     this.logger.info(`Get offer by id: ${offerId}`);
 
-    const offer = await this.offerService.find({id: new mongoose.Schema.Types.ObjectId(offerId)});
+    const offer = await this.offerService.findById(new mongoose.Types.ObjectId(offerId));
 
     if (!offer) {
       this.send(res, StatusCodes.NOT_FOUND, {message: `Offer with id ${offerId} not found`});
@@ -125,13 +116,13 @@ export class OfferController extends Controller {
     this.ok(res, offer);
   }
 
-  // PATCH /offers/{offerId}
+  //eslint-disable-next-line
   public async updateOffer(req: Request<any, object, UpdateOfferDto>, res: Response): Promise<void> {
     const {offerId} = req.params;
     const authToken = req.headers.authorization?.split(' ')[1];
     const userEmail = authToken ? await this.tokenService.findById(authToken)
       .then((token) => token?.userId)
-      .then((userId) => userId ? this.userService.findById(userId) : null)
+      .then((userId) => userId ? this.userService.findById(new mongoose.Types.ObjectId(userId)) : null)
       .then((user) => user?.email) : null;
 
     this.logger.info(`Updating offer ${offerId}`);
@@ -175,14 +166,13 @@ export class OfferController extends Controller {
     this.ok(res, updatedOffer);
   }
 
-  // DELETE /offers/{offerId}
   public async deleteOffer(req: Request, res: Response): Promise<void> {
     const {offerId} = req.params;
 
     const authToken = req.headers.authorization?.split(' ')[1];
     const userEmail = authToken ? await this.tokenService.findById(authToken)
       .then((token) => token?.userId)
-      .then((userId) => userId ? this.userService.findById(userId) : null)
+      .then((userId) => userId ? this.userService.findById(new mongoose.Types.ObjectId(userId)) : null)
       .then((user) => user?.email) : null;
 
     this.logger.info(`Deleting offer ${offerId}`);
@@ -204,13 +194,12 @@ export class OfferController extends Controller {
       return;
     }
 
-    await this.offerService.deleteById(new mongoose.Schema.Types.ObjectId(offerId));
-    await this.commentService.deleteByOfferId(new mongoose.Schema.Types.ObjectId(offerId));
+    await this.offerService.deleteById(new mongoose.Types.ObjectId(offerId));
+    await this.commentService.deleteByOfferId(new mongoose.Types.ObjectId(offerId));
 
     this.noContent(res);
   }
 
-  // GET /offers/premium/{city}
   public async getPremiumOffers(req: Request, res: Response): Promise<void> {
     const {city} = req.params;
     const validCities = ['Paris', 'Cologne', 'Brussels', 'Amsterdam', 'Hamburg', 'Dusseldorf'];
@@ -220,7 +209,7 @@ export class OfferController extends Controller {
     const authToken = req.headers.authorization?.split(' ')[1];
     const user = authToken ? await this.tokenService.findById(authToken)
       .then((token) => token?.userId)
-      .then((userId) => userId ? this.userService.findById(userId) : null)
+      .then((userId) => userId ? this.userService.findById(new mongoose.Types.ObjectId(userId)) : null)
       : null;
 
     if (!user) {

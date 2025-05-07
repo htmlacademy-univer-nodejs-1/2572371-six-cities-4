@@ -21,13 +21,13 @@ export class CommentsController extends Controller {
     this.logger.info('Register routes for CommentsController...');
 
     this.addRoute({
-      path: '/:offerId/comments',
+      path: '/offers/:offerId/comments',
       method: 'get',
       handler: this.getComments,
     });
 
     this.addRoute({
-      path: '/:offerId/comments',
+      path: '/offers/:offerId/comments',
       method: 'post',
       handler: this.createComment
     });
@@ -35,13 +35,13 @@ export class CommentsController extends Controller {
 
   public async getComments({params}: Request, res: Response): Promise<void> {
     const {offerId} = params;
-    const comments = await this.commentService.findByOfferId(new mongoose.Schema.Types.ObjectId(offerId), 50);
+    const comments = await this.commentService.findByOfferId(new mongoose.Types.ObjectId(offerId), 50);
 
     const commentsDto: (Comment | undefined)[] = (await Promise.all(comments.map(async (c) => {
       if (!c) {
         return undefined;
       }
-      const user = await this.userService.findById(new mongoose.Schema.Types.ObjectId(c.userId));
+      const user = await this.userService.findById(new mongoose.Types.ObjectId(c.userId));
       if (!user) {
         return undefined;
       }
@@ -51,7 +51,7 @@ export class CommentsController extends Controller {
         rating: c.rating,
         publicationDate: c.createdAt?.toDateString(),
         user: {
-          id: user.id,
+          id: user.id.toString(),
           name: user.name,
           avatarUrl: user.avatar,
           email: user.email,
@@ -67,7 +67,10 @@ export class CommentsController extends Controller {
     const authToken = req.headers.authorization?.split(' ')[1];
     const userEmail = authToken ? await this.tokenService.findById(authToken)
       .then((token) => token?.userId)
-      .then((userId) => userId ? this.userService.findById(userId) : null)
+      .then((userId) => userId
+        ? this.userService.findById(new mongoose.Types.ObjectId(userId))
+        : null
+      )
       .then((user) => user?.id) : null;
 
     const {offerId} = req.params;

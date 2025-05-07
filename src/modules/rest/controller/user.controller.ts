@@ -8,13 +8,14 @@ import {UserService} from '../../users/user-service.interface.js';
 import {StatusCodes} from 'http-status-codes';
 import {TokenService} from '../../token-service/token-service.interface.js';
 import {User} from '../../users/user-dbo.js';
+import mongoose from 'mongoose';
 
 @injectable()
 export class UserController extends Controller {
   constructor(
     @inject('Log') protected readonly logger: Logger,
     @inject('UserService') private readonly userService: UserService,
-    @inject('Token') private readonly tokenService: TokenService
+    @inject('TokenService') private readonly tokenService: TokenService
   ) {
     super(logger);
 
@@ -56,10 +57,11 @@ export class UserController extends Controller {
     }
 
     const userDbo: User = {
-      ...req.body,
-      id: req.body.id,
+      name: req.body.name,
+      email: req.body.email,
+      id: new mongoose.Types.ObjectId(req.body.id),
       avatar: 'avatar',
-      type: 'usual',
+      type: req.body.type,
       favorite: [],
       passwordHash: req.body.password,
     };
@@ -95,6 +97,14 @@ export class UserController extends Controller {
       this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Invalid email or password'});
       return;
     }
+
+    await this.tokenService.create({
+      userId: user.id,
+      refreshToken: token,
+      expiresAt: new Date(Date.now() + 60 * 60 * 1000),
+      userAgent: 'какая разница вообще',
+      createdAt: new Date(Date.now())
+    });
 
     const responseData: AuthResponse = {
       token,

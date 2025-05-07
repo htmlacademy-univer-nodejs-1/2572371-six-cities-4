@@ -7,7 +7,7 @@ export const TokenModule = new ContainerModule((bind) => {
   bind.bind('Token')
     .toConstantValue(TokenModel);
 
-  bind.bind<TokenService>(Symbol.for('TokenService'))
+  bind.bind<TokenService>('TokenService')
     .to(TokenDatabaseService)
     .inSingletonScope();
 });

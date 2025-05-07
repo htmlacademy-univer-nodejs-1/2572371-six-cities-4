@@ -22,7 +22,11 @@ export class TokenDatabaseService implements TokenService {
   }
 
   async findById(id: string): Promise<Token | null> {
-    return TokenModel.findById(id).exec();
+    const models = await TokenModel.find({refreshToken: id}).exec();
+    if (models.length > 0) {
+      return models[0];
+    }
+    return null;
   }
 
   async findByEmail(email: string): Promise<Token | null> {
