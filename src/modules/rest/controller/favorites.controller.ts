@@ -7,6 +7,7 @@ import {Logger} from 'pino';
 import {RentalServiceInterface} from '../../rental-offers/rental-service.interface.js';
 import {UserService} from '../../users/user-service.interface.js';
 import {TokenService} from '../../token-service/token-service.interface.js';
+import {ValidateObjectIdMiddleware} from '../middleware/validate-objectid.middleware.js';
 
 @injectable()
 export class FavoritesController extends Controller {
@@ -23,13 +24,14 @@ export class FavoritesController extends Controller {
     this.addRoute({
       path: '/favorites',
       method: 'get',
-      handler: this.getFavorites
+      handler: this.getFavorites,
     });
 
     this.addRoute({
       path: '/favorites/:offerId/:status',
       method: 'post',
-      handler: this.toggleFavoriteStatus
+      handler: this.toggleFavoriteStatus,
+      middlewares: [new ValidateObjectIdMiddleware('offerId')]
     });
   }
 

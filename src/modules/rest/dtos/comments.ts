@@ -1,4 +1,5 @@
 import { UserDto } from './userDto.js';
+import { IsString, IsInt, Min, Max, Length } from 'class-validator';
 
 export interface Comment {
   id: string;
@@ -8,7 +9,13 @@ export interface Comment {
   user: UserDto;
 }
 
-export interface CreateCommentDto {
-  text: string;
-  rating: number;
+export class CreateCommentDto {
+  @IsString()
+  @Length(5, 1024)
+  public text!: string;
+
+  @IsInt()
+  @Min(1)
+  @Max(5)
+  public rating!: number;
 }

@@ -9,6 +9,7 @@ import {StatusCodes} from 'http-status-codes';
 import {TokenService} from '../../token-service/token-service.interface.js';
 import {User} from '../../users/user-dbo.js';
 import mongoose from 'mongoose';
+import {ValidateDtoMiddleware} from '../middleware/validate-dto.middleware.js';
 
 @injectable()
 export class UserController extends Controller {
@@ -22,13 +23,15 @@ export class UserController extends Controller {
     this.addRoute({
       path: '/users/registry',
       method: 'post',
-      handler: asyncHandler(this.register.bind(this))
+      handler: asyncHandler(this.register.bind(this)),
+      middlewares: [new ValidateDtoMiddleware(CreateUserDto)]
     });
 
     this.addRoute({
       path: '/users/login',
       method: 'post',
-      handler: asyncHandler(this.login.bind(this))
+      handler: asyncHandler(this.login.bind(this)),
+      middlewares: [new ValidateDtoMiddleware(LoginUserDto)]
     });
 
     this.addRoute({

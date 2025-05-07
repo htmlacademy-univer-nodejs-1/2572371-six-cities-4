@@ -4,9 +4,11 @@ import {Controller} from './controller.abstract.js';
 import {Logger} from 'pino';
 import {CommentServiceInterface} from '../../comments/comment-service.interface.js';
 import mongoose from 'mongoose';
-import {Comment} from '../dtos/index.js';
+import {Comment, CreateCommentDto} from '../dtos/index.js';
 import {UserService} from '../../users/user-service.interface.js';
 import {TokenService} from '../../token-service/token-service.interface.js';
+import {ValidateObjectIdMiddleware} from '../middleware/validate-objectid.middleware.js';
+import {ValidateDtoMiddleware} from '../middleware/validate-dto.middleware.js';
 
 @injectable()
 export class CommentsController extends Controller {
@@ -24,12 +26,14 @@ export class CommentsController extends Controller {
       path: '/offers/:offerId/comments',
       method: 'get',
       handler: this.getComments,
+      middlewares: [new ValidateObjectIdMiddleware('offerId')]
     });
 
     this.addRoute({
       path: '/offers/:offerId/comments',
       method: 'post',
-      handler: this.createComment
+      handler: this.createComment,
+      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(CreateCommentDto)]
     });
   }
 

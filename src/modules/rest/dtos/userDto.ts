@@ -1,4 +1,5 @@
-import { UserType } from './cities.js';
+import {UserType} from './cities.js';
+import {IsString, IsEmail, IsOptional, Length, Matches} from 'class-validator';
 
 export interface UserDto {
   id: string;
@@ -8,17 +9,35 @@ export interface UserDto {
   type: UserType;
 }
 
-export interface CreateUserDto {
-  id: string;
-  name: string;
-  email: string;
-  password: string;
-  type: UserType;
+export class CreateUserDto {
+  @IsString()
+    id!: string;
+
+  @IsString()
+  @Length(1, 15, {message: 'Name must be between 1 and 15 characters'})
+    name!: string;
+
+  @IsEmail({}, {message: 'Invalid email address'})
+    email!: string;
+
+  @IsString()
+  @Length(6, 12, {message: 'Password must be between 6 and 12 characters'})
+    password!: string;
+
+  type!: UserType;
+
+  @IsOptional()
+  @Matches(/\.(jpg|jpeg|png)$/, {message: 'Avatar must be in .jpg, .jpeg or .png format'})
+    avatarUrl?: string;
 }
 
-export interface LoginUserDto {
-  email: string;
-  password: string;
+export class LoginUserDto {
+  @IsEmail({}, {message: 'Invalid email address'})
+    email!: string;
+
+  @IsString()
+  @Length(6, 12, {message: 'Password must be between 6 and 12 characters'})
+    password!: string;
 }
 
 export interface AuthResponse {

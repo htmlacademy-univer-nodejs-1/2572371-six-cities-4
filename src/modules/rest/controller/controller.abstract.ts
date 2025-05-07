@@ -3,6 +3,7 @@ import { StatusCodes } from 'http-status-codes';
 import { injectable } from 'inversify';
 import { RouteInterface } from '../route.interface.js';
 import { Logger } from 'pino';
+import { MiddlewareInterface } from '../middleware.interface.js';
 
 @injectable()
 export abstract class Controller {
@@ -17,8 +18,12 @@ export abstract class Controller {
   }
 
   public addRoute(route: RouteInterface) {
+    const middlewares = route.middlewares?.map(
+      (middleware: MiddlewareInterface) => middleware.execute.bind(middleware)
+    ) || [];
+
     const handler = route.handler.bind(this);
-    this._router[route.method](route.path, handler);
+    this._router[route.method](route.path, ...middlewares, handler);
     this.logger.info(`Route registered: ${route.method.toUpperCase()} ${route.path}`);
   }
 
