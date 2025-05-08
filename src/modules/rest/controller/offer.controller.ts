@@ -10,6 +10,8 @@ import {CreateOfferDto, UpdateOfferDto} from '../dtos/index.js';
 import {TokenService} from '../../token-service/token-service.interface.js';
 import {UserService} from '../../users/user-service.interface.js';
 import mongoose from 'mongoose';
+import {ValidateObjectIdMiddleware} from '../middleware/validate-objectid.middleware.js';
+import {ValidateDtoMiddleware} from '../middleware/validate-dto.middleware.js';
 
 @injectable()
 export class OfferController extends Controller {
@@ -31,25 +33,29 @@ export class OfferController extends Controller {
     this.addRoute({
       path: '/offers',
       method: 'post',
-      handler: asyncHandler(this.createOffer.bind(this))
+      handler: asyncHandler(this.createOffer.bind(this)),
+      middlewares: [new ValidateDtoMiddleware(CreateOfferDto)]
     });
 
     this.addRoute({
       path: '/offers/:offerId',
       method: 'get',
-      handler: asyncHandler(this.getOfferById.bind(this))
+      handler: asyncHandler(this.getOfferById.bind(this)),
+      middlewares: [new ValidateObjectIdMiddleware('offerId')]
     });
 
     this.addRoute({
       path: '/offers/:offerId',
       method: 'patch',
-      handler: asyncHandler(this.updateOffer.bind(this))
+      handler: asyncHandler(this.updateOffer.bind(this)),
+      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto)]
     });
 
     this.addRoute({
       path: '/offers/:offerId',
       method: 'delete',
-      handler: asyncHandler(this.deleteOffer.bind(this))
+      handler: asyncHandler(this.deleteOffer.bind(this)),
+      middlewares: [new ValidateObjectIdMiddleware('offerId')]
     });
 
     this.addRoute({
