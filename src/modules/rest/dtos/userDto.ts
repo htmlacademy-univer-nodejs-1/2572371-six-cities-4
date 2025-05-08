@@ -10,8 +10,7 @@ export interface UserDto {
 }
 
 export class CreateUserDto {
-  @IsString()
-    id!: string;
+  id!: string;
 
   @IsString()
   @Length(1, 15, {message: 'Name must be between 1 and 15 characters'})

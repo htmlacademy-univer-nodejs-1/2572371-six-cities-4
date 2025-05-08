@@ -1,5 +1,6 @@
 import convict, {Config} from 'convict';
-import { ipaddress, url, email } from 'convict-format-with-validator';
+import {ipaddress, url, email} from 'convict-format-with-validator';
+import dotenv from 'dotenv';
 
 convict.addFormats({
   ipaddress,
@@ -8,32 +9,42 @@ convict.addFormats({
 });
 
 export type AppConfig = {
-  port: number,
-  dbHost: string,
-  salt: string
+  PORT: number,
+  DB_HOST: string,
+  SALT: string,
+  UPLOAD_DIRECTORY_PATH: string
 }
 
-const config: Config<AppConfig> = convict({
-  port: {
-    doc: 'The port to bind.',
-    format: 'port',
-    default: 3000,
-    env: 'PORT'
-  },
-  dbHost: {
-    doc: 'Database host IP address',
-    format: 'ipaddress',
-    default: '127.0.0.1',
-    env: 'DB_HOST'
-  },
-  salt: {
-    doc: 'Salt for hashing',
-    format: String,
-    default: '',
-    env: 'SALT'
-  }
-});
+export function createConfig(): Config<AppConfig> {
+  // Load environment variables from .env
+  dotenv.config();
 
-config.validate({ allowed: 'strict' });
+  const config: Config<AppConfig> = convict({
+    PORT: {
+      format: 'port',
+      default: 4000,
+      env: 'PORT'
+    },
+    SALT: {
+      format: String,
+      default: 'salt',
+      env: 'SALT'
+    },
+    DB_HOST: {
+      format: String,
+      default: 'localhost',
+      env: 'DB_HOST'
+    },
+    UPLOAD_DIRECTORY_PATH: {
+      format: String,
+      default: 'uploads',
+      env: 'UPLOAD_DIRECTORY_PATH'
+    }
+  });
 
-export default config;
+  config.validate({allowed: 'strict'});
+  return config;
+}
+
+// Export a singleton instance of the config
+export const config = createConfig();

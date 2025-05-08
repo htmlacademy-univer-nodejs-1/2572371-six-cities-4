@@ -12,6 +12,10 @@ import {UserService} from '../../users/user-service.interface.js';
 import mongoose from 'mongoose';
 import {ValidateObjectIdMiddleware} from '../middleware/validate-objectid.middleware.js';
 import {ValidateDtoMiddleware} from '../middleware/validate-dto.middleware.js';
+import {DocumentExistsMiddleware} from '../middleware/document-exists-middleware.js';
+import {UploadFileMiddleware} from '../middleware/upload-file.middleware.js';
+import {Config} from 'convict';
+import {AppConfig} from '../../../config.js';
 
 @injectable()
 export class OfferController extends Controller {
@@ -20,7 +24,8 @@ export class OfferController extends Controller {
     @inject('RentalService') private readonly offerService: RentalServiceInterface,
     @inject('CommentService') private readonly commentService: CommentService,
     @inject('TokenService') private readonly tokenService: TokenService,
-    @inject('UserService') private readonly userService: UserService
+    @inject('UserService') private readonly userService: UserService,
+    @inject('Config') private readonly config: Config<AppConfig>
   ) {
     super(logger);
 
@@ -48,20 +53,75 @@ export class OfferController extends Controller {
       path: '/offers/:offerId',
       method: 'patch',
       handler: asyncHandler(this.updateOffer.bind(this)),
-      middlewares: [new ValidateObjectIdMiddleware('offerId'), new ValidateDtoMiddleware(UpdateOfferDto)]
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new ValidateDtoMiddleware(UpdateOfferDto),
+        new DocumentExistsMiddleware(
+          async (id) => !!(await this.offerService.findById(id)),
+          'Rental offer',
+          'offerId'
+        )
+      ]
     });
 
     this.addRoute({
       path: '/offers/:offerId',
       method: 'delete',
       handler: asyncHandler(this.deleteOffer.bind(this)),
-      middlewares: [new ValidateObjectIdMiddleware('offerId')]
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(
+          async (id) => !!(await this.offerService.findById(id)),
+          'Rental offer',
+          'offerId'
+        )
+      ]
     });
 
     this.addRoute({
       path: '/offers/premium/:city',
       method: 'get',
       handler: asyncHandler(this.getPremiumOffers.bind(this))
+    });
+
+    this.addRoute({
+      path: '/offers/:offerId/image',
+      method: 'post',
+      handler: asyncHandler(this.uploadImage.bind(this)),
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(
+          async (id) => !!(await this.offerService.findById(id)),
+          'Rental offer',
+          'offerId'
+        ),
+        new UploadFileMiddleware(
+          this.config.getProperties().UPLOAD_DIRECTORY_PATH,
+          'offers',
+          'image',
+          ['image/jpeg', 'image/png']
+        )
+      ]
+    });
+
+    this.addRoute({
+      path: '/offers/:offerId/photos',
+      method: 'post',
+      handler: this.addPhoto,
+      middlewares: [
+        new ValidateObjectIdMiddleware('offerId'),
+        new DocumentExistsMiddleware(
+          async (id) => !!(await this.offerService.findById(id)),
+          'Rental offer',
+          'offerId'
+        ),
+        new UploadFileMiddleware(
+          this.config.getProperties().UPLOAD_DIRECTORY_PATH,
+          'offers',
+          'photo',
+          ['image/jpeg', 'image/png', 'image/webp']
+        )
+      ]
     });
   }
 
@@ -238,5 +298,57 @@ export class OfferController extends Controller {
     const premiumOffers = await this.offerService.find({city: city, isPremium: true});
 
     this.ok(res, premiumOffers);
+  }
+
+  public async uploadImage(req: Request, res: Response): Promise<void> {
+    const {offerId} = req.params;
+    const {image} = req.body;
+
+    const authToken = req.headers.authorization?.split(' ')[1];
+    if (!authToken) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Unauthorized'});
+      return;
+    }
+
+    await this.offerService.updateImage(new mongoose.Types.ObjectId(offerId), image);
+
+    this.ok(res, {image});
+  }
+
+  public async addPhoto(req: Request, res: Response): Promise<void> {
+    const {offerId} = req.params;
+    const {photo} = req.body;
+
+    const authToken = req.headers.authorization?.split(' ')[1];
+    if (!authToken) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Unauthorized'});
+      return;
+    }
+
+    const userEmail = await this.tokenService.findById(authToken)
+      .then((token) => token?.userId)
+      .then((userId) => userId ? this.userService.findById(new mongoose.Types.ObjectId(userId)) : null)
+      .then((user) => user?.email);
+
+    if (!userEmail) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Unauthorized'});
+      return;
+    }
+
+    const offer = await this.offerService.findById(new mongoose.Types.ObjectId(offerId));
+
+    if (!offer) {
+      this.send(res, StatusCodes.NOT_FOUND, {message: `Offer with id ${offerId} not found`});
+      return;
+    }
+
+    if (offer!.author !== userEmail) {
+      this.send(res, StatusCodes.FORBIDDEN, {message: 'Only owner can add photos to offer'});
+      return;
+    }
+
+    await this.offerService.addPhoto(new mongoose.Types.ObjectId(offerId), photo);
+
+    this.ok(res, {photoUrl: photo});
   }
 }

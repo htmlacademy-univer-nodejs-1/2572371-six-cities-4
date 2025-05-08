@@ -3,6 +3,13 @@ import {RentalOffer, RentalOfferDbo} from './rental-offer.dbo.js';
 import mongoose from 'mongoose';
 
 export class RentalService implements RentalServiceInterface {
+  async updateImage(id: mongoose.Types.ObjectId, image: string): Promise<void> {
+    await RentalOfferDbo.updateOne({_id: id}, {image}).exec();
+  }
+
+  async addPhoto(id: mongoose.Types.ObjectId, image: string): Promise<void> {
+    await RentalOfferDbo.updateOne({_id: id}, {$push: {photos: image}}).exec();
+  }
 
   async findById(id: mongoose.Types.ObjectId): Promise<RentalOffer | null> {
     return await RentalOfferDbo.findById(id).exec();

@@ -7,4 +7,6 @@ export interface RentalServiceInterface extends DatabaseOperationsInterface<Rent
   findByIds(ids: mongoose.Types.ObjectId[]): Promise<RentalOffer[]>;
   findById(id: mongoose.Types.ObjectId): Promise<RentalOffer | null>;
   update(document: Partial<RentalOffer>): Promise<void>;
+  updateImage(id: mongoose.Types.ObjectId, image: string): Promise<void>;
+  addPhoto(id: mongoose.Types.ObjectId, image: string): Promise<void>;
 }

@@ -10,13 +10,17 @@ import {TokenService} from '../../token-service/token-service.interface.js';
 import {User} from '../../users/user-dbo.js';
 import mongoose from 'mongoose';
 import {ValidateDtoMiddleware} from '../middleware/validate-dto.middleware.js';
+import {UploadFileMiddleware} from '../middleware/upload-file.middleware.js';
+import {Config} from 'convict';
+import {AppConfig} from '../../../config.js';
 
 @injectable()
 export class UserController extends Controller {
   constructor(
     @inject('Log') protected readonly logger: Logger,
     @inject('UserService') private readonly userService: UserService,
-    @inject('TokenService') private readonly tokenService: TokenService
+    @inject('TokenService') private readonly tokenService: TokenService,
+    @inject('Config') private readonly config: Config<AppConfig>
   ) {
     super(logger);
 
@@ -45,6 +49,45 @@ export class UserController extends Controller {
       method: 'get',
       handler: asyncHandler(this.checkUser.bind(this))
     });
+    this.addRoute({
+      path: '/users/avatar',
+      method: 'post',
+      handler: asyncHandler(this.uploadAvatar.bind(this)),
+      middlewares: [
+        new UploadFileMiddleware(
+          this.config.getProperties().UPLOAD_DIRECTORY_PATH,
+          'avatars',
+          'avatar',
+          ['image/jpeg', 'image/png']
+        )
+      ]
+    });
+  }
+
+  public async uploadAvatar(req: Request, res: Response): Promise<void> {
+    const {avatar} = req.body;
+    const authToken = req.headers.authorization?.split(' ')[1];
+
+    if (!authToken) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Unauthorized'});
+      return;
+    }
+
+    const token = await this.tokenService.findById(authToken);
+    if (!token) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Invalid token'});
+      return;
+    }
+
+    const user = await this.userService.findById(token.userId);
+    if (!user) {
+      this.send(res, StatusCodes.NOT_FOUND, {message: 'User not found'});
+      return;
+    }
+
+    await this.userService.updateAvatar(user.id, avatar);
+
+    this.ok(res, {avatarUrl: avatar});
   }
 
   public async register(req: Request<object, object, CreateUserDto>, res: Response): Promise<void> {
@@ -92,8 +135,14 @@ export class UserController extends Controller {
   public async login(req: Request<object, object, LoginUserDto>, res: Response): Promise<void> {
     this.logger.info('User login: ', req.body.email);
 
-    const userFindResult = await this.userService.find(req.body);
+    const userFindResult = await this.userService.find({email: req.body.email});
     const user = userFindResult[0];
+
+    if(user.passwordHash !== req.body.password) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Invalid email or password'});
+      return;
+    }
+
     const token = user.email;
 
     if (!userFindResult) {

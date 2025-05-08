@@ -5,6 +5,12 @@ import mongoose from 'mongoose';
 
 @injectable()
 export class UserDatabaseService implements UserService {
+  async updateAvatar(userId: mongoose.Types.ObjectId, link: string): Promise<void> {
+    await UserModel.updateOne(
+      {_id: userId},
+      {$set: {avatar: link}}
+    ).exec();
+  }
 
   async addToFavorites(userId: mongoose.Types.ObjectId, offerId: string): Promise<void> {
     await UserModel.updateOne(

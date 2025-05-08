@@ -7,4 +7,5 @@ export interface UserService extends DatabaseOperationsInterface<User> {
   findByEmail(email: string): Promise<User | null>;
   addToFavorites(userId: mongoose.Types.ObjectId, offerId: string): Promise<void>;
   removeFromFavorites(userId: mongoose.Types.ObjectId, offerId: string): Promise<void>;
+  updateAvatar(userId: mongoose.Types.ObjectId, link: string): Promise<void>;
 }
