@@ -85,7 +85,7 @@ export class OfferController extends Controller {
     });
 
     this.addRoute({
-      path: '/:offerId/image',
+      path: '/offers/:offerId/image',
       method: 'post',
       handler: asyncHandler(this.uploadImage.bind(this)),
       middlewares: [
@@ -105,7 +105,7 @@ export class OfferController extends Controller {
     });
 
     this.addRoute({
-      path: '/:offerId/photos',
+      path: '/offers/:offerId/photos',
       method: 'post',
       handler: this.addPhoto,
       middlewares: [

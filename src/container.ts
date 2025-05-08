@@ -4,7 +4,7 @@ import {createOfferContainer} from './modules/rental-offers/rental-offer.contain
 import {createUsersContainer} from './modules/users/user-service.container.js';
 import {Application} from './application.js';
 import {Config} from 'convict';
-import config, {AppConfig} from './config.js';
+import {AppConfig, config} from './config.js';
 import {Logger} from 'pino';
 import appLogger from './appLogger.js';
 import {createCommentsContainer} from './modules/comments/comment-service.container.js';

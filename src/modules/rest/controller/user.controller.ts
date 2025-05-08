@@ -135,8 +135,14 @@ export class UserController extends Controller {
   public async login(req: Request<object, object, LoginUserDto>, res: Response): Promise<void> {
     this.logger.info('User login: ', req.body.email);
 
-    const userFindResult = await this.userService.find(req.body);
+    const userFindResult = await this.userService.find({email: req.body.email});
     const user = userFindResult[0];
+
+    if(user.passwordHash !== req.body.password) {
+      this.send(res, StatusCodes.UNAUTHORIZED, {message: 'Invalid email or password'});
+      return;
+    }
+
     const token = user.email;
 
     if (!userFindResult) {

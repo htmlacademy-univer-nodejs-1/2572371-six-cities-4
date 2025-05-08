@@ -6,6 +6,8 @@
 /docs/
 .idea/*
 
+uploads/
+
 .DS_Store
 coverage
 *.log
